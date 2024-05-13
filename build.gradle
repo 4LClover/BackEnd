@@ -32,6 +32,10 @@ dependencies {
 
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'
 	runtimeOnly 'com.h2database:h2'
+
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.session:spring-session-jdbc'
+
 }
 
 tasks.named('test') {
