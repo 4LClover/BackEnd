@@ -17,7 +17,7 @@ Spring Boot
 <br>
 
 ## 개발 환경
-* -
+* JPA
 * -
 * -
 <br>
