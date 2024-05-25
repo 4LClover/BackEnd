@@ -1,5 +1,6 @@
 package com.clover.plogger.user.service;
 
+import com.clover.plogger.redis.RedisRankingService;
 import com.clover.plogger.user.MemberRepository;
 import com.clover.plogger.user.domain.Member;
 import com.clover.plogger.user.dto.MemberRequestDto;
@@ -22,6 +23,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final RedisRankingService redisRankingService;
 
     public MemberResponseDto signup(MemberRequestDto requestDto) {
         if (memberRepository.existsByEmail(requestDto.getEmail())) {
@@ -29,7 +31,15 @@ public class AuthService {
         }
 
         Member member = requestDto.toMember(passwordEncoder);
-        return MemberResponseDto.of(memberRepository.save(member));
+        memberRepository.save(member);
+
+        try {
+            redisRankingService.addUserScore(member.getNickname(), member.getClovers());
+        } catch (Exception e) {
+            throw new RuntimeException("Redis 등록 실패", e);
+        }
+
+        return MemberResponseDto.of(member);
     }
 
     public TokenDto login(MemberRequestDto requestDto) {

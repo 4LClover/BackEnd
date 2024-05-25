@@ -24,6 +24,7 @@ public class WebSecurityConfig {
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -44,9 +45,10 @@ public class WebSecurityConfig {
                 //접근 권한 설정
                 .authorizeHttpRequests(authorize -> authorize
 
-                        // auth 하위 폴더에 있는 자료들은 모두 접근 가능
-                        .requestMatchers("/auth/**").permitAll()
+                        // 모두 접근 가능
+                        .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()) // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+
 
                 //JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스를 적용
                 .apply(new JwtSecurityConfig(tokenProvider));

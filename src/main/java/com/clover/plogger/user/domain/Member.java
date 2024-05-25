@@ -28,12 +28,17 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
+
+    @Column(nullable = false)
+    private int clovers;
+
     @Builder
-    public Member(Long id, String email, String password, String nickname, Authority authority) {
+    public Member(Long id, String email, String password, String nickname, Authority authority, int clovers) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.authority = authority;
+        this.clovers = clovers;
     }
 }
