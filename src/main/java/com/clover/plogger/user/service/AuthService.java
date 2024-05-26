@@ -33,11 +33,7 @@ public class AuthService {
         Member member = requestDto.toMember(passwordEncoder);
         memberRepository.save(member);
 
-        try {
-            redisRankingService.addUserScore(member.getNickname(), member.getClovers());
-        } catch (Exception e) {
-            throw new RuntimeException("Redis 등록 실패", e);
-        }
+
 
         return MemberResponseDto.of(member);
     }
