@@ -62,7 +62,7 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("https://profound-meerkat-020076.netlify.app/");
+        config.addAllowedOrigin("https://plogger.cnu.team/");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
