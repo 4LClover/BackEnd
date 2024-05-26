@@ -8,14 +8,14 @@ on:
 
 jobs:
   build:
-    ## checkout후 자바 17 버전으로 설정을 합니다
+    ## checkout후 자바 21 버전으로 설정을 합니다
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
       ## gradlew 의 권한을 줍니다.
       - name: Grant execute permission for gradlew
@@ -23,7 +23,7 @@ jobs:
 
       ## gradle build
       - name: Build with Gradle
-        run: ./gradlew clean build --debug
+        run: ./gradlew clean build
       ## 이미지 태그에 시간 설정을 하기위해서 현재 시간을 가져옵니다.
       - name: Get current time
         uses: 1466587594/get-current-time@v2
