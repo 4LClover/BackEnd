@@ -47,7 +47,7 @@ public class PloggingController {
     }
 
 
-    @GetMapping("/calendar")
+    @GetMapping("/daily")
     public ResponseEntity<com.clover.plogger.plogging.dto.PloggingResponseDTO> getPloggingByDate(@RequestBody PloggingDateDTO request) {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
         Member member = memberRepository.findById(currentMemberId)
