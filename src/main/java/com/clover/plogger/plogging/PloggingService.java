@@ -1,46 +1,38 @@
 package com.clover.plogger.plogging;
 
-import com.clover.plogger.plogging.domain.Plogging;
+import com.clover.plogger.user.MemberRepository;
+import com.clover.plogger.user.config.SecurityUtil;
 import com.clover.plogger.user.domain.Member;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.sql.Date;
 import java.util.List;
-import java.util.Optional;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Service
+@RequiredArgsConstructor
 public class PloggingService {
+    private final PloggingRepository ploggingRepository;
+    private  final MemberRepository memberRepository;
 
-    @Autowired
-    private PloggingRepository ploggingRepository;
-
-    public Plogging savePlogging(Plogging plogging) {
-        return ploggingRepository.save(plogging);
+    private Member getCurrentMember() {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        return memberRepository.findById(currentMemberId)
+                .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
     }
 
-    public com.clover.plogger.plogging.dto.PloggingResponseDTO getPloggingByDate(Date date, Member member) throws ParseException {
-        Optional<Plogging> ploggingOptional = ploggingRepository.findByDateAndMember(date, member);
-
-        if (ploggingOptional.isPresent()) {
-            Plogging plogging = ploggingOptional.get();
-            return com.clover.plogger.plogging.dto.PloggingResponseDTO.builder()
-                    .member(member)
-                    .date(date)
-                    .time(plogging.getTime())
-                    .distance(plogging.getDistance())
-                    .goalDistance(plogging.getGoalDistance())
-                    .image(plogging.getImageURL())
-                    .build();
-        } else {
-            throw new IllegalArgumentException("No plogging record found for the given date");
-        }
+    @Transactional
+    public PloggingResponseDTO savePlogging(PloggingRequestDTO requestDTO) {
+        Member member = getCurrentMember();
+        Plogging plogging = requestDTO.toPlogging(member);
+        ploggingRepository.save(plogging);
+        return PloggingResponseDTO.of(plogging);
     }
 
-    public List<Plogging> getPloggingRecordsByMonth(Date date) {
+    public List<PloggingResponseDTO> getPloggingRecordsByMonth(Date date) {
         // 전달받은 Date 객체를 LocalDate로 변환
         LocalDate localDate = date.toLocalDate();
 

@@ -1,8 +1,7 @@
-package com.clover.plogger.plogging.domain;
+package com.clover.plogger.plogging;
 
 import com.clover.plogger.user.domain.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

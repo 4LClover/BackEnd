@@ -1,6 +1,5 @@
-package com.clover.plogger.plogging.dto;
+package com.clover.plogger.plogging;
 
-import com.clover.plogger.user.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,9 +12,18 @@ import java.sql.Date;
 @Builder
 public class PloggingResponseDTO {
     private Date date;
-    private Member member;
     private Time time;
     private Float distance;
     private Float goalDistance;
-    private String image;
+    private String imageURL;
+
+    public static PloggingResponseDTO of(Plogging plogging) {
+        return PloggingResponseDTO.builder()
+                .date(plogging.getDate())
+                .time(plogging.getTime())
+                .distance(plogging.getDistance())
+                .goalDistance(plogging.getGoalDistance())
+                .imageURL((plogging.getImageURL()))
+                .build();
+    }
 }
