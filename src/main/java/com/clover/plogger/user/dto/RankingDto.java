@@ -1,6 +1,5 @@
 package com.clover.plogger.user.dto;
 
-import com.clover.plogger.user.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

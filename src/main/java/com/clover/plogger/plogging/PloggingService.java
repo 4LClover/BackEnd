@@ -1,8 +1,10 @@
 package com.clover.plogger.plogging;
 
+import com.clover.plogger.redis.RedisRankingService;
 import com.clover.plogger.user.MemberRepository;
 import com.clover.plogger.user.config.SecurityUtil;
 import com.clover.plogger.user.domain.Member;
+import com.clover.plogger.user.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import java.time.YearMonth;
 public class PloggingService {
     private final PloggingRepository ploggingRepository;
     private  final MemberRepository memberRepository;
+    private final MemberService memberService;
+    private final RedisRankingService redisRankingService;
 
     private Member getCurrentMember() {
         Long currentMemberId = SecurityUtil.getCurrentMemberId();
@@ -29,7 +33,24 @@ public class PloggingService {
         Member member = getCurrentMember();
         Plogging plogging = requestDTO.toPlogging(member);
         ploggingRepository.save(plogging);
+
+        // 점수 계산 로직
+        int cloversToAdd = calculateClovers(requestDTO.getGoalDistance(), requestDTO.getDistance());
+        //System.out.println(cloversToAdd);
+        memberService.updateClovers(cloversToAdd);
+
+        // 클로버 수를 Redis 랭킹에 업데이트
+        redisRankingService.updateUserScore(member.getNickname(), member.getClovers());
+
         return PloggingResponseDTO.of(plogging);
+    }
+
+    private int calculateClovers(Float goalDistance, Float distance) {
+        if (distance >= goalDistance) {
+            return (int) (50 + 5 * Math.floor(goalDistance))/10; // 목표 거리 이상 달성 시 기본 50점
+        } else {
+            return (int) (5 * Math.floor(distance))/10; // 목표 거리 이하 달성 시 1km당 5점
+        }
     }
 
     public List<PloggingResponseDTO> getPloggingRecordsByMonth(Date date) {

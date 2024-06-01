@@ -66,6 +66,7 @@ public class MemberService {
                 .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
     }
 
+    @Transactional
     public Member updateClovers(int clovers) {
         Member member = getCurrentMember();
         member.setClovers(member.getClovers() + clovers);
@@ -81,28 +82,39 @@ public class MemberService {
         return RankingDto.builder()
                 .nickname(member.getNickname())
                 .clovers(member.getClovers())
-                .rank(rank != null ? rank.intValue() : -1) // 랭킹이 없는 경우 -1로 설정
+                .rank(rank != null ? rank.intValue() + 1 : -1) // 랭킹이 없는 경우 -1로 설정
                 .build();
     }
 
     public List<RankingDto> getTopUsers(int count) {
         Set<ZSetOperations.TypedTuple<String>> topUsersWithScores = redisRankingService.getTopUsersWithScores(count);
         List<RankingDto> topUsers = new ArrayList<>();
-        int rank = 1;
+
+        int currentRank = 1;
+        int displayRank = 1;
+        Double lastScore = null;
+
         for (ZSetOperations.TypedTuple<String> tuple : topUsersWithScores) {
             String nickname = tuple.getValue();
             Double scoreObj = tuple.getScore();
             int score = scoreObj != null ? scoreObj.intValue() : 0;
+
+            if (lastScore != null && !scoreObj.equals(lastScore)) {
+                displayRank = currentRank;
+            }
+
             topUsers.add(
                     RankingDto.builder()
                             .nickname(nickname)
                             .clovers(score)
-                            .rank(rank++)
+                            .rank(displayRank)
                             .build()
             );
+
+            lastScore = scoreObj;
+            currentRank++;
         }
+
         return topUsers;
     }
-
-
 }
