@@ -14,7 +14,7 @@ public class PloggingController {
     private final PloggingService ploggingService;
 
     @PostMapping("/post")
-    public ResponseEntity<PloggingResponseDTO> savePlogging(@RequestBody PloggingRequestDTO requestDTO) {
+    public ResponseEntity<CloverResponseDto> savePlogging(@RequestBody PloggingRequestDTO requestDTO) {
         return ResponseEntity.ok(ploggingService.savePlogging(requestDTO));
     }
 

@@ -29,27 +29,30 @@ public class PloggingService {
     }
 
     @Transactional
-    public PloggingResponseDTO savePlogging(PloggingRequestDTO requestDTO) {
+    public CloverResponseDto savePlogging(PloggingRequestDTO requestDTO) {
         Member member = getCurrentMember();
         Plogging plogging = requestDTO.toPlogging(member);
         ploggingRepository.save(plogging);
 
         // 점수 계산 로직
-        int cloversToAdd = calculateClovers(requestDTO.getGoalDistance(), requestDTO.getDistance());
-        //System.out.println(cloversToAdd);
-        memberService.updateClovers(cloversToAdd);
+        int score = calculateClovers(requestDTO.getGoalDistance(), requestDTO.getDistance());
+        int clovers = score/10;
+        memberService.updateClovers(clovers);
 
         // 클로버 수를 Redis 랭킹에 업데이트
         redisRankingService.updateUserScore(member.getNickname(), member.getClovers());
 
-        return PloggingResponseDTO.of(plogging);
+        return CloverResponseDto.builder()
+                .score(score)
+                .clovers(score/10)
+                .build();
     }
 
     private int calculateClovers(Float goalDistance, Float distance) {
         if (distance >= goalDistance) {
-            return (int) (50 + 5 * Math.floor(goalDistance))/10; // 목표 거리 이상 달성 시 기본 50점
+            return (int) (50 + 5 * Math.floor(goalDistance)); // 목표 거리 이상 달성 시 기본 50점
         } else {
-            return (int) (5 * Math.floor(distance))/10; // 목표 거리 이하 달성 시 1km당 5점
+            return (int) (5 * Math.floor(distance)); // 목표 거리 이하 달성 시 1km당 5점
         }
     }
 
