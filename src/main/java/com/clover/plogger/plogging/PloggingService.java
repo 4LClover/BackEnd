@@ -36,7 +36,14 @@ public class PloggingService {
 
         // 점수 계산 로직
         int score = calculateClovers(requestDTO.getGoalDistance(), requestDTO.getDistance());
-        int clovers = score/10;
+
+        int clovers;
+        if ("fail".equals(requestDTO.getIsSuccessful())) {
+            clovers = 0;
+        } else {
+            clovers = score/10;
+        }
+        System.out.println(clovers);
         memberService.updateClovers(clovers);
 
         // 클로버 수를 Redis 랭킹에 업데이트
@@ -44,7 +51,7 @@ public class PloggingService {
 
         return CloverResponseDto.builder()
                 .score(score)
-                .clovers(score/10)
+                .clovers(clovers)
                 .build();
     }
 
