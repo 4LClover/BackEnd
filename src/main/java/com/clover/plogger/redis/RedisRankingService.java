@@ -13,12 +13,12 @@ public class RedisRankingService {
     private static final String RANKING_KEY = "userRanking";
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
-    private final ZSetOperations<String, Object> zSetOperations;
+    private final ZSetOperations<String, String> zSetOperations;
 
     @Autowired
-    public RedisRankingService(RedisTemplate<String, Object> redisTemplate) {
+    public RedisRankingService(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.zSetOperations = redisTemplate.opsForZSet();
     }
@@ -29,8 +29,8 @@ public class RedisRankingService {
     }
 
     // 상위 n개의 사용자를 조회하여 반환
-    public Set<Object> getTopUsers(int count) {
-        return zSetOperations.reverseRange(RANKING_KEY, 0, count - 1);
+    public Set<ZSetOperations.TypedTuple<String>> getTopUsersWithScores(int count) {
+        return zSetOperations.reverseRangeWithScores(RANKING_KEY, 0, count - 1);
     }
 
     // 주어진 사용자의 랭킹을 조회하여 반환

@@ -54,3 +54,5 @@ jobs:
           docker build -t plogger:${{steps.current-time.outputs.formattedTime}} .
           docker tag plogger:${{steps.current-time.outputs.formattedTime}} public.ecr.aws/l0d7n0a1/plogger:${{steps.current-time.outputs.formattedTime}}
           docker push public.ecr.aws/l0d7n0a1/plogger:${{steps.current-time.outputs.formattedTime}}
+          docker tag plogger:${{steps.current-time.outputs.formattedTime}} public.ecr.aws/l0d7n0a1/plogger:latest
+          docker push public.ecr.aws/l0d7n0a1/plogger:latest

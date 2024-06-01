@@ -5,11 +5,16 @@ import com.clover.plogger.user.MemberRepository;
 import com.clover.plogger.user.config.SecurityUtil;
 import com.clover.plogger.user.domain.Member;
 import com.clover.plogger.user.dto.MemberResponseDto;
+import com.clover.plogger.user.dto.RankingDto;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -18,6 +23,19 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisRankingService redisRankingService;
+
+    @PostConstruct
+    public void init() {
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members) {
+            try {
+                redisRankingService.addUserScore(member.getNickname(), member.getClovers());
+            } catch (Exception e) {
+                System.err.println("Redis 등록 실패 for member: " + member.getNickname());
+                e.printStackTrace();
+            }
+        }
+    }
 
     public MemberResponseDto getMyInfoBySecurity() {
         return memberRepository.findById(SecurityUtil.getCurrentMemberId())
@@ -57,17 +75,34 @@ public class MemberService {
         return member;
     }
 
-    public Set<Object> getTopUsers(int count) {
-        return redisRankingService.getTopUsers(count);
+    public RankingDto getUserRank() {
+        Member member = getCurrentMember();
+        Long rank = redisRankingService.getUserRank(member.getNickname());
+        return RankingDto.builder()
+                .nickname(member.getNickname())
+                .clovers(member.getClovers())
+                .rank(rank != null ? rank.intValue() : -1) // 랭킹이 없는 경우 -1로 설정
+                .build();
     }
 
-    public Long getUserRank() {
-        Member member = getCurrentMember();
-        return redisRankingService.getUserRank(member.getNickname());
+    public List<RankingDto> getTopUsers(int count) {
+        Set<ZSetOperations.TypedTuple<String>> topUsersWithScores = redisRankingService.getTopUsersWithScores(count);
+        List<RankingDto> topUsers = new ArrayList<>();
+        int rank = 1;
+        for (ZSetOperations.TypedTuple<String> tuple : topUsersWithScores) {
+            String nickname = tuple.getValue();
+            Double scoreObj = tuple.getScore();
+            int score = scoreObj != null ? scoreObj.intValue() : 0;
+            topUsers.add(
+                    RankingDto.builder()
+                            .nickname(nickname)
+                            .clovers(score)
+                            .rank(rank++)
+                            .build()
+            );
+        }
+        return topUsers;
     }
 
-    public Double getUserScore() {
-        Member member = getCurrentMember();
-        return redisRankingService.getUserScore(member.getNickname());
-    }
+
 }

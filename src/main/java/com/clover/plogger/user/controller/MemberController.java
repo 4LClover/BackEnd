@@ -4,11 +4,13 @@ import com.clover.plogger.user.domain.Member;
 import com.clover.plogger.user.dto.ChangePasswordRequestDto;
 import com.clover.plogger.user.dto.MemberRequestDto;
 import com.clover.plogger.user.dto.MemberResponseDto;
+import com.clover.plogger.user.dto.RankingDto;
 import com.clover.plogger.user.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -43,23 +45,16 @@ public class MemberController {
 
     // 사용자 랭킹 조회
     @GetMapping("/rank")
-    public ResponseEntity<Long> getUserRank() {
-        Long rank = memberService.getUserRank();
-        return ResponseEntity.ok(rank);
+    public ResponseEntity<RankingDto> getUserRank() {
+        RankingDto rankingDto = memberService.getUserRank();
+        return ResponseEntity.ok(rankingDto);
     }
 
     // 상위 사용자 조회
     @GetMapping("/top")
-    public ResponseEntity<Set<Object>> getTopUsers(@RequestParam int count) {
-        Set<Object> topUsers = memberService.getTopUsers(count);
+    public ResponseEntity<List<RankingDto>> getTopUsers(@RequestParam int count) {
+        List<RankingDto> topUsers = memberService.getTopUsers(count);
         return ResponseEntity.ok(topUsers);
-    }
-
-    // 사용자 점수 조회
-    @GetMapping("/score")
-    public ResponseEntity<Double> getUserScore() {
-        Double score = memberService.getUserScore();
-        return ResponseEntity.ok(score);
     }
 
 }
