@@ -18,7 +18,7 @@ public class PloggingController {
         return ResponseEntity.ok(ploggingService.savePlogging(requestDTO));
     }
 
-    @GetMapping("/monthly")
+    @PostMapping("/monthly")
     public List<PloggingResponseDTO> getPloggingRecordsByMonth(@RequestBody PloggingDateDTO requestDTO) {
         Date date = Date.valueOf(requestDTO.getDate().toLocalDate());
         return ploggingService.getPloggingRecordsByMonth(date);
