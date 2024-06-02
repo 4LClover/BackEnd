@@ -26,6 +26,7 @@ public class MemberService {
 
     @PostConstruct
     public void init() {
+        redisRankingService.clearRanking();
         List<Member> members = memberRepository.findAll();
         for (Member member : members) {
             try {

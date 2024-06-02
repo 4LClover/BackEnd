@@ -58,4 +58,8 @@ public class RedisRankingService {
         zSetOperations.remove(RANKING_KEY, userId);
     }
 
+    public void clearRanking() {
+        redisTemplate.delete(RANKING_KEY);
+    }
+
 }
