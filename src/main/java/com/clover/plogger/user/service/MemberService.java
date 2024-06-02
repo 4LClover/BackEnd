@@ -81,17 +81,22 @@ public class MemberService {
         member.setClovers(member.getClovers() + clovers);
         memberRepository.save(member);
         // 클로버 수를 Redis 랭킹에 업데이트
-        redisRankingService.updateUserScore(member.getNickname(), clovers);
+        redisRankingService.updateUserScore(member.getNickname(), member.getClovers());
         return member;
     }
 
     public RankingDto getUserRank() {
         Member member = getCurrentMember();
         Long rank = redisRankingService.getUserRank(member.getNickname());
+
+        Double userScore = redisRankingService.getUserScore(member.getNickname());
+        Long sameScoreUserCount = redisRankingService.getCountOfSameScoreUsers(userScore);
+        int adjustedRank = rank != null ? rank.intValue() + 1 - sameScoreUserCount.intValue() : -1;
+
         return RankingDto.builder()
                 .nickname(member.getNickname())
                 .clovers(member.getClovers())
-                .rank(rank != null ? rank.intValue() + 1 : -1) // 랭킹이 없는 경우 -1로 설정
+                .rank(adjustedRank != -1 ? adjustedRank + 1 : -1)
                 .build();
     }
 

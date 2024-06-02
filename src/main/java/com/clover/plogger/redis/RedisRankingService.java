@@ -54,6 +54,16 @@ public class RedisRankingService {
         });
     }
 
+    // 주어진 사용자의 점수를 조회하여 반환
+    public Double getUserScore(String userId) {
+        return zSetOperations.score(RANKING_KEY, userId);
+    }
+
+    // 주어진 사용자의 점수와 동일한 점수를 가진 다른 사용자들의 수를 반환
+    public Long getCountOfSameScoreUsers(double score) {
+        return zSetOperations.count(RANKING_KEY, score, score);
+    }
+
     public void removeUserScore(String userId) {
         zSetOperations.remove(RANKING_KEY, userId);
     }
