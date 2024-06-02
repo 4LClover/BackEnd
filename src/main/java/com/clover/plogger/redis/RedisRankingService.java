@@ -54,4 +54,8 @@ public class RedisRankingService {
         });
     }
 
+    public void removeUserScore(String userId) {
+        zSetOperations.remove(RANKING_KEY, userId);
+    }
+
 }

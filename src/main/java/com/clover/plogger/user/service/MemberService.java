@@ -45,9 +45,17 @@ public class MemberService {
 
     @Transactional
     public MemberResponseDto changeMemberNickname(String nickname) {
-        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
+        Member member = memberRepository.findById(SecurityUtil.getCurrentMemberId())
+                .orElseThrow(() -> new RuntimeException("로그인 유저 정보가 없습니다"));
+        String oldNickname = member.getNickname();
         member.setNickname(nickname);
-        return MemberResponseDto.of(memberRepository.save(member));
+        Member updatedMember = memberRepository.save(member);
+
+        // Update Redis ranking
+        redisRankingService.removeUserScore(oldNickname);
+        redisRankingService.addUserScore(updatedMember.getNickname(), updatedMember.getClovers());
+
+        return MemberResponseDto.of(updatedMember);
     }
 
     @Transactional
