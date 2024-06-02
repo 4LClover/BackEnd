@@ -1,6 +1,7 @@
 package com.clover.plogger.plogging;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +19,14 @@ public class PloggingController {
         return ResponseEntity.ok(ploggingService.savePlogging(requestDTO));
     }
 
-    @GetMapping("/monthly")
-    public List<PloggingResponseDTO> getPloggingRecordsByMonth(@RequestBody PloggingDateDTO requestDTO) {
-        Date date = Date.valueOf(requestDTO.getDate().toLocalDate());
-        return ploggingService.getPloggingRecordsByMonth(date);
+    @PostMapping("/monthly")
+    public ResponseEntity<List<PloggingResponseDTO>> getPloggingRecordsByMonth(@RequestBody PloggingDateDTO requestDTO) {
+        try {
+            Date date = Date.valueOf(requestDTO.getDate());
+            List<PloggingResponseDTO> records = ploggingService.getPloggingRecordsByMonth(date);
+            return new ResponseEntity<>(records, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }
