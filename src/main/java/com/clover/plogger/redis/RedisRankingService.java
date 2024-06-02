@@ -59,9 +59,10 @@ public class RedisRankingService {
         return zSetOperations.score(RANKING_KEY, userId);
     }
 
-    // 주어진 사용자의 점수와 동일한 점수를 가진 다른 사용자들의 수를 반환
-    public Long getCountOfSameScoreUsers(double score) {
-        return zSetOperations.count(RANKING_KEY, score, score);
+    // 주어진 사용자의 점수보다 높은 랭킹을 가진 사용자들의 수를 반환
+    public Long getCountOfHigherRankUsers(double userScore) {
+        Long higherRankUsersCount = zSetOperations.count(RANKING_KEY, userScore + 1, Double.MAX_VALUE);
+        return higherRankUsersCount != null ? higherRankUsersCount : 0;
     }
 
     public void removeUserScore(String userId) {

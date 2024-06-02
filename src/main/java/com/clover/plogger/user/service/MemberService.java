@@ -87,16 +87,15 @@ public class MemberService {
 
     public RankingDto getUserRank() {
         Member member = getCurrentMember();
-        Long rank = redisRankingService.getUserRank(member.getNickname());
 
         Double userScore = redisRankingService.getUserScore(member.getNickname());
-        Long sameScoreUserCount = redisRankingService.getCountOfSameScoreUsers(userScore);
-        int adjustedRank = rank != null ? rank.intValue() + 1 - sameScoreUserCount.intValue() : -1;
+        Long higherRankUsersCount = redisRankingService.getCountOfHigherRankUsers(userScore);
+        int adjustedRank = higherRankUsersCount.intValue() + 1;
 
         return RankingDto.builder()
                 .nickname(member.getNickname())
                 .clovers(member.getClovers())
-                .rank(adjustedRank != -1 ? adjustedRank + 1 : -1)
+                .rank(adjustedRank)
                 .build();
     }
 
