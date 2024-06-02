@@ -31,7 +31,7 @@ public class FlaskService {
         HttpEntity<String> entity = new HttpEntity<>(param, headers);
 
         //Flask server url
-        String url = "awesome-ai";
+        String url = "http://awesome-ai";
 
         //Return response from flask server
         return restTemplate.postForObject(url, entity, String.class);
