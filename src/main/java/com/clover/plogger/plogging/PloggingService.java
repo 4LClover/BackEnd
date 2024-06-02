@@ -13,6 +13,7 @@ import java.sql.Date;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +65,7 @@ public class PloggingService {
     }
 
     public List<PloggingResponseDTO> getPloggingRecordsByMonth(Date date) {
+        Member member = getCurrentMember();
         LocalDate localDate = date.toLocalDate();
         int year = localDate.getYear();
         int month = localDate.getMonthValue();
@@ -75,6 +77,10 @@ public class PloggingService {
         LocalDate localEndDate = yearMonth.atEndOfMonth();
         Date endDate = Date.valueOf(localEndDate);
 
-        return ploggingRepository.findByDateBetween(startDate, endDate);
+        List<Plogging> ploggingRecords = ploggingRepository.findByMemberAndDateBetween(member, startDate, endDate);
+
+        return ploggingRecords.stream()
+                .map(PloggingResponseDTO::of)
+                .collect(Collectors.toList());
     }
 }
