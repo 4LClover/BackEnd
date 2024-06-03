@@ -58,9 +58,9 @@ public class PloggingService {
 
     private int calculateClovers(Float goalDistance, Float distance) {
         if (distance >= goalDistance) {
-            return (int) (50 + 5 * Math.floor(goalDistance)); // 목표 거리 이상 달성 시 기본 50점
+            return (int) (50 + Math.floor(distance/goalDistance)*50);
         } else {
-            return (int) (5 * Math.floor(distance)); // 목표 거리 이하 달성 시 1km당 5점
+            return (int) (10 + Math.floor(distance/goalDistance)*50);
         }
     }
 
