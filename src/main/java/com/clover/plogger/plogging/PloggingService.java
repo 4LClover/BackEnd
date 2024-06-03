@@ -58,9 +58,9 @@ public class PloggingService {
 
     private int calculateClovers(Float goalDistance, Float distance) {
         if (distance >= goalDistance) {
-            return (int) (50 + Math.floor(distance/goalDistance)*50);
+            return (int) (50 + Math.min((distance/goalDistance), 1) * 25 + Math.min(distance*5, 25));
         } else {
-            return (int) (10 + Math.floor(distance/goalDistance)*50);
+            return (int) (10 + Math.min((distance/goalDistance), 1) * 25 + Math.min(distance*5, 25));
         }
     }
 
